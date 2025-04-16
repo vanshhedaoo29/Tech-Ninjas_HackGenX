@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Analysis Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.6;
+        }
+        .container { max-width: 1000px; margin: 20px auto; padding: 20px; }
+        header {
+            background: #343a40; color: white; text-align: center;
+            padding: 1.5em 0; margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav {
+            background: #495057; display: flex; justify-content: center;
+            border-radius: 5px; margin-top: 10px;
+        }
+        nav a {
+            color: white; text-decoration: none; padding: 0.8em 1.5em;
+            font-weight: bold; border-radius: 5px; transition: background 0.3s ease;
+        }
+        nav a:hover { background: #555b62; }
+        section {
+            background: white; padding: 20px; margin-bottom: 20px;
+            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        section h2 {
+            color: #183b61; border-bottom: 2px solid #223f5e;
+            padding-bottom: 0.5em; margin-bottom: 1em;
+        }
+        .hidden { display: none; }
+        .cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .card {
+            background: #f8f9fa; border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            display: flex; flex-direction: column;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.03); box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            background-color: #183b61; color: white;
+            padding: 1em; border-radius: 10px 10px 0 0;
+            font-weight: bold; text-align: center;
+        }
+        .card-body { padding: 1em; flex-grow: 1; }
+        .card table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
+        .card th, .card td {
+            border: 1px solid #dee2e6; padding: 0.5em; text-align: center; font-size: 0.9em;
+        }
+        .card th { background: #e9ecef; }
+        .card-actions {
+            padding: 0.8em; text-align: center;
+        }
+        .card-actions button {
+            background: #dc3545; color: white; border: none;
+            padding: 0.6em 1em; border-radius: 5px;
+            cursor: pointer; transition: background 0.3s;
+        }
+        .card-actions button:hover { background: #c82333; }
+        input[type="number"], input[type="date"], select {
+            width: calc(100% - 12px); padding: 0.8em;
+            margin: 0.5em 0; border: 1px solid #ccc;
+            border-radius: 5px; font-size: 1em;
+        }
+        button {
+            background: #28a745; color: white;
+            font-weight: bold; padding: 0.8em 1.2em;
+            border: none; border-radius: 5px; cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover { background: #218838; }
+        #analysis table {
+            width: 100%; border-collapse: collapse; margin-top: 1em;
+            background-color: white;
+        }
+        #analysis th, #analysis td {
+            border: 1px solid #dee2e6; padding: 0.7em; text-align: center;
+        }
+        #analysis th { background: #e9ecef; }
+        #analysis td button {
+            background: #dc3545; color: white;
+            border: none; padding: 0.5em 0.8em;
+            border-radius: 4px; cursor: pointer;
+            margin: 0.2em; transition: background 0.3s;
+        }
+        #analysis td button:hover { background: #c82333; }
+        footer {
+            background: #343a40; color: white;
+            text-align: center; padding: 1em 0;
+            margin-top: 20px; border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            nav { flex-direction: column; align-items: center; }
+            nav a { margin: 0.5em 0; width: 80%; text-align: center; }
+            .cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Smart Budget Allocation</h1>
+    <nav>
+        <a onclick="showPage('home')">Home</a>
+        <a onclick="showPage('transaction')">Transaction</a>
+        <a onclick="showPage('analysis')">Analysis</a>
+        <a onclick="showPage('graph')">Graphs</a>
+    </nav>
+</header>
+
+<div class="container">
+    <section id="home">
+        <h2>Budget Categories</h2>
+        <div class="cards" id="cardContainer"></div>
+        <button onclick="addNewCard()">+ Add New Card</button>
+    </section>
+
+    <section id="transaction" class="hidden">
+        <h2>Transaction</h2>
+        <select id="transType">
+            <option value="budget">Total Budget</option>
+            <option value="expense">Expense</option>
+        </select>
+        <select id="transCard"></select>
+        <input type="number" id="transAmount" placeholder="Enter Amount (₹)">
+        <input type="date" id="transDate">
+        <button onclick="addTransaction()">Add Transaction</button>
+    </section>
+
+    <section id="analysis" class="hidden">
+        <h2>Analysis</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Section</th>
+                    <th>Total Budget</th>
+                    <th>Total Credit</th>
+                    <th>Total Debit</th>
+                    <th>Remaining Balance</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="analysisBody"></tbody>
+        </table>
+    </section>
+
+    <section id="graph" class="hidden">
+        <h2>Visual Analysis</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+            <div>
+                <h3>Budget vs Expenses (Pie)</h3>
+                <canvas id="pieChart" width="400" height="400"></canvas>
+            </div>
+            <div>
+                <h3>Spending Over Time (Line)</h3>
+                <canvas id="lineChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </section>
+</div>
+
+<footer>&copy; 2025 Budget Analysis App</footer>
+
+<script>
+    const cardData = {};
+    const initialCards = ["Education", "Health", "Transport", "Food", "Infrastructure"];
+    initialCards.forEach(name => cardData[name] = { budget: [], expense: [] });
+
+    let pieChart, lineChart;
+
+    function showPage(page) {
+        document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+        document.getElementById(page).classList.remove("hidden");
+        if (page === "home") renderCards();
+        if (page === "transaction") updateTransactionDropdown();
+        if (page === "analysis") updateAnalysis();
+        if (page === "graph") updateCharts();
+    }
+
+    function renderCards() {
+        const container = document.getElementById("cardContainer");
+        container.innerHTML = '';
+        for (let name in cardData) {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+                <div class="card-header">${name}</div>
+                <div class="card-body">
+                    <table>
+                        <thead><tr><th>Type</th><th>₹</th><th>Date</th><th>Action</th></tr></thead>
+                        <tbody id="${name}-transactions"></tbody>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <button onclick="deleteCard('${name}')">Delete Card</button>
+                </div>
+            `;
+            container.appendChild(card);
+            updateCardTable(name);
+        }
+    }
+
+    function addNewCard() {
+        const name = prompt("Enter card name:");
+        if (name && !cardData[name]) {
+            cardData[name] = { budget: [], expense: [] };
+            renderCards();
+            updateTransactionDropdown();
+            updateAnalysis();
+            updateCharts();
+        } else {
+            alert("Invalid or existing card name.");
+        }
+    }
+
+    function deleteCard(name) {
+        if (confirm(`Delete card "${name}" and its data?`)) {
+            delete cardData[name];
+            renderCards();
+            updateTransactionDropdown();
+            updateAnalysis();
+            updateCharts();
+        }
+    }
+
+    function updateTransactionDropdown() {
+        const dropdown = document.getElementById("transCard");
+        dropdown.innerHTML = '<option disabled selected>Select Category</option>';
+        for (let name in cardData) {
+            const opt = document.createElement("option");
+            opt.value = name;
+            opt.textContent = name;
+            dropdown.appendChild(opt);
+        }
+    }
+
+    function addTransaction() {
+        const type = document.getElementById("transType").value;
+        const name = document.getElementById("transCard").value;
+        const amount = parseFloat(document.getElementById("transAmount").value);
+        const date = document.getElementById("transDate").value;
+
+        if (!type || !name || !amount || !date) return alert("Please fill in all fields.");
+
+        cardData[name][type].push({ amount, date });
+        updateCardTable(name);
+        updateAnalysis();
+        updateCharts();
+
+        document.getElementById("transAmount").value = '';
+        document.getElementById("transDate").value = '';
+    }
+
+    function updateCardTable(name) {
+        const tbody = document.getElementById(`${name}-transactions`);
+        tbody.innerHTML = '';
+        ["budget", "expense"].forEach(type => {
+            cardData[name][type].forEach((entry, i) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${type}</td>
+                    <td>₹${entry.amount}</td>
+                    <td>${entry.date}</td>
+                    <td><button onclick="removeTransaction('${name}', '${type}', ${i})">Cancel</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+    }
+
+    function removeTransaction(name, type, index) {
+        cardData[name][type].splice(index, 1);
+        updateCardTable(name);
+        updateAnalysis();
+        updateCharts();
+    }
+
+    function updateAnalysis() {
+        const body = document.getElementById("analysisBody");
+        body.innerHTML = '';
+        for (let name in cardData) {
+            const totalBudget = cardData[name].budget.reduce((a, b) => a + b.amount, 0);
+            const totalExpense = cardData[name].expense.reduce((a, b) => a + b.amount, 0);
+            const remaining = totalBudget - totalExpense;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>₹${totalBudget}</td>
+                <td>₹${totalBudget}</td>
+                <td>₹${totalExpense}</td>
+                <td>₹${remaining}</td>
+                <td><button onclick="clearCardTransactions('${name}')">Clear</button></td>
+            `;
+            body.appendChild(row);
+        }
+    }
+
+    function clearCardTransactions(name) {
+        if (confirm(`Clear all transactions in "${name}"?`)) {
+            cardData[name].budget = [];
+            cardData[name].expense = [];
+            updateCardTable(name);
+            updateAnalysis();
+            updateCharts();
+        }
+    }
+
+    function updateCharts() {
+        const labels = Object.keys(cardData);
+        const budgetData = labels.map(name => cardData[name].budget.reduce((sum, t) => sum + t.amount, 0));
+        const expenseData = labels.map(name => cardData[name].expense.reduce((sum, t) => sum + t.amount, 0));
+
+        // Pie Chart
+        if (pieChart) pieChart.destroy();
+        pieChart = new Chart(document.getElementById("pieChart"), {
+            type: 'pie',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Expense Distribution',
+                    data: expenseData,
+                    backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71', '#3498db', '#9b59b6']
+                }]
+            }
+        });
+
+        // Line Chart
+        const dateMap = {};
+        labels.forEach(name => {
+            [...cardData[name].budget, ...cardData[name].expense].forEach(entry => {
+                if (!dateMap[entry.date]) dateMap[entry.date] = { budget: 0, expense: 0 };
+            });
+        });
+        labels.forEach(name => {
+            cardData[name].budget.forEach(entry => dateMap[entry.date].budget += entry.amount);
+            cardData[name].expense.forEach(entry => dateMap[entry.date].expense += entry.amount);
+        });
+        const dates = Object.keys(dateMap).sort();
+        const budgetOverTime = dates.map(d => dateMap[d].budget);
+        const expenseOverTime = dates.map(d => dateMap[d].expense);
+
+        if (lineChart) lineChart.destroy();
+        lineChart = new Chart(document.getElementById("lineChart"), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: 'Total Budget',
+                        data: budgetOverTime,
+                        borderColor: '#28a745',
+                        backgroundColor: '#28a74533',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Total Expenses',
+                        data: expenseOverTime,
+                        borderColor: '#dc3545',
+                        backgroundColor: '#dc354533',
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Budget vs Expenses Over Time'
+                    }
+                }
+            }
+        });
+    }
+
+    renderCards();
+    showPage('home');
+</script>
+
+</body>
+</html>
