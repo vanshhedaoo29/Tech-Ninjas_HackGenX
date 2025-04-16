@@ -2,392 +2,960 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Budget Analysis Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Analysis</title>
+    <!-- Include Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* Basic Reset & Body Style */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa; color: #333; line-height: 1.6;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        .container { max-width: 1000px; margin: 20px auto; padding: 20px; }
+
+        /* Header */
         header {
-            background: #343a40; color: white; text-align: center;
-            padding: 1.5em 0; margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
         }
-        nav {
-            background: #495057; display: flex; justify-content: center;
-            border-radius: 5px; margin-top: 10px;
+
+        header h3 {
+            margin-bottom: 0.5rem;
         }
-        nav a {
-            color: white; text-decoration: none; padding: 0.8em 1.5em;
-            font-weight: bold; border-radius: 5px; transition: background 0.3s ease;
+
+        header nav {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
         }
-        nav a:hover { background: #555b62; }
-        section {
-            background: white; padding: 20px; margin-bottom: 20px;
-            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+        header nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
-        section h2 {
-            color: #183b61; border-bottom: 2px solid #223f5e;
-            padding-bottom: 0.5em; margin-bottom: 1em;
+
+        header nav a:hover,
+        header nav a.active {
+            background-color: #555;
         }
-        .hidden { display: none; }
-        .cards {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
+
+        /* Main Content Area */
+        main {
+            flex: 1; /* Takes up remaining vertical space */
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 1rem auto;
+            width: 95%;
         }
+
+        /* Page Visibility Control */
+        .page {
+            display: none; /* Hide pages by default */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: block; /* Show active page */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Home Page - Cards */
+         #home-page h4 {
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+         }
+        #cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
         .card {
-            background: #f8f9fa; border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            display: flex; flex-direction: column;
-            transition: transform 0.3s, box-shadow 0.3s;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Contain floats/margins */
         }
-        .card:hover {
-            transform: scale(1.03); box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+
+        .card h5 {
+            margin-bottom: 1rem;
+            color: #0056b3;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
         }
-        .card-header {
-            background-color: #183b61; color: white;
-            padding: 1em; border-radius: 10px 10px 0 0;
-            font-weight: bold; text-align: center;
+
+        .card .transactions-list {
+            list-style: none;
+            padding: 0;
+            max-height: 150px; /* Limit height and add scroll */
+            overflow-y: auto;
+            margin-top: 1rem;
+            font-size: 0.9em;
         }
-        .card-body { padding: 1em; flex-grow: 1; }
-        .card table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
-        .card th, .card td {
-            border: 1px solid #dee2e6; padding: 0.5em; text-align: center; font-size: 0.9em;
+
+        .card .transactions-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px dotted #eee;
         }
-        .card th { background: #e9ecef; }
-        .card-actions {
-            padding: 0.8em; text-align: center;
+         .card .transactions-list li:last-child {
+            border-bottom: none;
+         }
+
+        .card .transactions-list .transaction-details {
+            flex-grow: 1;
+            margin-right: 10px;
         }
-        .card-actions button {
-            background: #dc3545; color: white; border: none;
-            padding: 0.6em 1em; border-radius: 5px;
-            cursor: pointer; transition: background 0.3s;
+        .card .transactions-list .transaction-amount.budget {
+            color: green;
         }
-        .card-actions button:hover { background: #c82333; }
-        input[type="number"], input[type="date"], select {
-            width: calc(100% - 12px); padding: 0.8em;
-            margin: 0.5em 0; border: 1px solid #ccc;
-            border-radius: 5px; font-size: 1em;
+        .card .transactions-list .transaction-amount.expense {
+            color: red;
         }
-        button {
-            background: #28a745; color: white;
-            font-weight: bold; padding: 0.8em 1.2em;
-            border: none; border-radius: 5px; cursor: pointer;
-            transition: background 0.3s ease;
+
+        .card .transactions-list .delete-transaction-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
         }
-        button:hover { background: #218838; }
-        #analysis table {
-            width: 100%; border-collapse: collapse; margin-top: 1em;
-            background-color: white;
+        .card .transactions-list .delete-transaction-btn:hover {
+            background: #c82333;
         }
-        #analysis th, #analysis td {
-            border: 1px solid #dee2e6; padding: 0.7em; text-align: center;
+
+
+        #add-card-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #e9ecef;
+            border-radius: 5px;
         }
-        #analysis th { background: #e9ecef; }
-        #analysis td button {
-            background: #dc3545; color: white;
-            border: none; padding: 0.5em 0.8em;
-            border-radius: 4px; cursor: pointer;
-            margin: 0.2em; transition: background 0.3s;
+
+        #add-card-section input[type="text"] {
+             padding: 0.6rem;
+             margin-right: 0.5rem;
+             border: 1px solid #ccc;
+             border-radius: 4px;
         }
-        #analysis td button:hover { background: #c82333; }
+
+        /* Transaction Page - Form */
+        #transaction-page h4, #analysis-page h4 {
+             margin-bottom: 1.5rem;
+             border-bottom: 2px solid #ddd;
+             padding-bottom: 0.5rem;
+        }
+
+        #transaction-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        #transaction-form select,
+        #transaction-form input[type="number"],
+        #transaction-form input[type="date"] {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #transaction-form button {
+             display: inline-block;
+             padding: 0.8rem 1.5rem;
+             background: #28a745; /* Green */
+             color: white;
+             border: none;
+             border-radius: 4px;
+             cursor: pointer;
+             transition: background-color 0.3s ease;
+        }
+         #transaction-form button:hover {
+             background: #218838;
+         }
+
+
+        /* Analysis Page */
+        #analysis-table-container {
+            margin-bottom: 2rem;
+            overflow-x: auto; /* Allow horizontal scrolling on small screens */
+        }
+
+        #analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #analysis-table th,
+        #analysis-table td {
+            border: 1px solid #ddd;
+            padding: 0.8rem 1rem;
+            text-align: left;
+        }
+
+        #analysis-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        #analysis-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #chart-container {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            width: 700px;
+            height: 700px;
+        }
+         #chart-container h5 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #333;
+         }
+
+        #ai-report-container {
+             background: #eef;
+             padding: 1.5rem;
+             border-radius: 8px;
+             border: 1px solid #cce;
+        }
+         #ai-report-container h5 {
+             margin-bottom: 1rem;
+             color: #0056b3;
+         }
+         #ai-report {
+             white-space: pre-wrap; /* Preserve formatting */
+             font-family: Consolas, Monaco, monospace;
+             font-size: 0.95em;
+             background-color: #f8f9fa;
+             padding: 1rem;
+             border: 1px dashed #ccc;
+             border-radius: 4px;
+             min-height: 100px;
+         }
+
+
+        /* Footer */
         footer {
-            background: #343a40; color: white;
-            text-align: center; padding: 1em 0;
-            margin-top: 20px; border-radius: 5px;
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem 0;
+            background: #333;
+            color: #fff;
+            font-size: 0.9em;
         }
-        @media (max-width: 768px) {
-            nav { flex-direction: column; align-items: center; }
-            nav a { margin: 0.5em 0; width: 80%; text-align: center; }
-            .cards { grid-template-columns: 1fr; }
+
+        /* Utility Classes */
+        .button {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button-danger {
+             background: #dc3545;
+        }
+        .button-danger:hover {
+             background: #c82333;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Smart Budget Allocation</h1>
-    <nav>
-        <a onclick="showPage('home')">Home</a>
-        <a onclick="showPage('transaction')">Transaction</a>
-        <a onclick="showPage('analysis')">Analysis</a>
-        <a onclick="showPage('graph')">Graphs</a>
-    </nav>
-</header>
+    <header>
+        <h3>Budget Analysis Dashboard</h3>
+        <nav>
+            <a href="#home" data-page="home-page" class="nav-link active">Home</a>
+            <a href="#transaction" data-page="transaction-page" class="nav-link">Transaction</a>
+            <a href="#analysis" data-page="analysis-page" class="nav-link">Analysis</a>
+        </nav>
+    </header>
 
-<div class="container">
-    <section id="home">
-        <h2>Budget Categories</h2>
-        <div class="cards" id="cardContainer"></div>
-        <button onclick="addNewCard()">+ Add New Card</button>
-    </section>
+    <main id="main-content">
 
-    <section id="transaction" class="hidden">
-        <h2>Transaction</h2>
-        <select id="transType">
-            <option value="budget">Total Budget</option>
-            <option value="expense">Expense</option>
-        </select>
-        <select id="transCard"></select>
-        <input type="number" id="transAmount" placeholder="Enter Amount (₹)">
-        <input type="date" id="transDate">
-        <button onclick="addTransaction()">Add Transaction</button>
-    </section>
-
-    <section id="analysis" class="hidden">
-        <h2>Analysis</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Section</th>
-                    <th>Total Budget</th>
-                    <th>Total Credit</th>
-                    <th>Total Debit</th>
-                    <th>Remaining Balance</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="analysisBody"></tbody>
-        </table>
-    </section>
-
-    <section id="graph" class="hidden">
-        <h2>Visual Analysis</h2>
-        <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
-            <div>
-                <h3>Budget vs Expenses (Pie)</h3>
-                <canvas id="pieChart" width="400" height="400"></canvas>
+        <!-- Home Page Section -->
+        <section id="home-page" class="page active">
+            <h4>Budget Categories</h4>
+            <div id="cards-container">
+                <!-- Cards will be loaded here by JavaScript -->
+                <p>Loading budget cards...</p>
             </div>
-            <div>
-                <h3>Spending Over Time (Line)</h3>
-                <canvas id="lineChart" width="400" height="400"></canvas>
+
+            <div id="add-card-section">
+                <h5>Create New Category Card</h5>
+                <input type="text" id="new-card-name" placeholder="Enter new category name">
+                <button id="add-card-btn" class="button">Create Card</button>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
 
-<footer>&copy; 2025 Budget Analysis App</footer>
-
-<script>
-    const cardData = {};
-    const initialCards = ["Education", "Health", "Transport", "Food", "Infrastructure"];
-    initialCards.forEach(name => cardData[name] = { budget: [], expense: [] });
-
-    let pieChart, lineChart;
-
-    function showPage(page) {
-        document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
-        document.getElementById(page).classList.remove("hidden");
-        if (page === "home") renderCards();
-        if (page === "transaction") updateTransactionDropdown();
-        if (page === "analysis") updateAnalysis();
-        if (page === "graph") updateCharts();
-    }
-
-    function renderCards() {
-        const container = document.getElementById("cardContainer");
-        container.innerHTML = '';
-        for (let name in cardData) {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-                <div class="card-header">${name}</div>
-                <div class="card-body">
-                    <table>
-                        <thead><tr><th>Type</th><th>₹</th><th>Date</th><th>Action</th></tr></thead>
-                        <tbody id="${name}-transactions"></tbody>
-                    </table>
+        <!-- Transaction Page Section -->
+        <section id="transaction-page" class="page">
+            <h4>Add New Transaction</h4>
+            <form id="transaction-form">
+                <div>
+                    <label for="transaction-type">Transaction Type:</label>
+                    <select id="transaction-type" required>
+                        <option value="budget">Budget Allocation (Credit)</option>
+                        <option value="expense">Expense (Debit)</option>
+                    </select>
                 </div>
-                <div class="card-actions">
-                    <button onclick="deleteCard('${name}')">Delete Card</button>
+                 <div>
+                    <label for="transaction-category">Category:</label>
+                    <select id="transaction-category" required>
+                        <!-- Options will be loaded here by JavaScript -->
+                         <option value="">-- Select Category --</option>
+                    </select>
                 </div>
-            `;
-            container.appendChild(card);
-            updateCardTable(name);
-        }
-    }
+                 <div>
+                    <label for="transaction-amount">Amount (₹):</label>
+                    <input type="number" id="transaction-amount" min="0.01" step="0.01" placeholder="e.g., 500.00" required>
+                </div>
+                 <div>
+                    <label for="transaction-date">Date:</label>
+                    <input type="date" id="transaction-date" required>
+                </div>
+                <button type="submit">Add Transaction</button>
+            </form>
+        </section>
 
-    function addNewCard() {
-        const name = prompt("Enter card name:");
-        if (name && !cardData[name]) {
-            cardData[name] = { budget: [], expense: [] };
-            renderCards();
-            updateTransactionDropdown();
-            updateAnalysis();
-            updateCharts();
-        } else {
-            alert("Invalid or existing card name.");
-        }
-    }
+        <!-- Analysis Page Section -->
+        <section id="analysis-page" class="page">
+            <h4>Budget Summary & Analysis</h4>
 
-    function deleteCard(name) {
-        if (confirm(`Delete card "${name}" and its data?`)) {
-            delete cardData[name];
-            renderCards();
-            updateTransactionDropdown();
-            updateAnalysis();
-            updateCharts();
-        }
-    }
+            <div id="analysis-table-container">
+                 <h5>Summary Table</h5>
+                <table id="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Category (Card Section)</th>
+                            <th>Total Budget Allocated (₹)</th>
+                            <th>Total Expenses (₹)</th>
+                            <th>Remaining Budget (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysis-table-body">
+                        <!-- Table rows will be loaded here by JavaScript -->
+                        <tr><td colspan="4">Loading analysis data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
-    function updateTransactionDropdown() {
-        const dropdown = document.getElementById("transCard");
-        dropdown.innerHTML = '<option disabled selected>Select Category</option>';
-        for (let name in cardData) {
-            const opt = document.createElement("option");
-            opt.value = name;
-            opt.textContent = name;
-            dropdown.appendChild(opt);
-        }
-    }
+             <div id="chart-container">
+                 <h5>Budget vs. Expenses Graph</h5>
+                 <canvas id="budgetChart"></canvas>
+             </div>
 
-    function addTransaction() {
-        const type = document.getElementById("transType").value;
-        const name = document.getElementById("transCard").value;
-        const amount = parseFloat(document.getElementById("transAmount").value);
-        const date = document.getElementById("transDate").value;
+             <div id="ai-report-container">
+                  <h5>AI Budget Analysis Report</h5>
+                  <div id="ai-report">
+                      Generating analysis... please add some transactions.
+                  </div>
+             </div>
 
-        if (!type || !name || !amount || !date) return alert("Please fill in all fields.");
+        </section>
 
-        cardData[name][type].push({ amount, date });
-        updateCardTable(name);
-        updateAnalysis();
-        updateCharts();
+    </main>
 
-        document.getElementById("transAmount").value = '';
-        document.getElementById("transDate").value = '';
-    }
+    <footer>
+        <p>&copy; 2023 Budget Analysis Tool. All rights reserved.</p>
+    </footer>
 
-    function updateCardTable(name) {
-        const tbody = document.getElementById(`${name}-transactions`);
-        tbody.innerHTML = '';
-        ["budget", "expense"].forEach(type => {
-            cardData[name][type].forEach((entry, i) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${type}</td>
-                    <td>₹${entry.amount}</td>
-                    <td>${entry.date}</td>
-                    <td><button onclick="removeTransaction('${name}', '${type}', ${i})">Cancel</button></td>
-                `;
-                tbody.appendChild(row);
-            });
-        });
-    }
+    <script>
+        // --- DATA STORAGE & MANAGEMENT ---
+        let budgetData = {
+            cards: [] // Structure: { id: string, name: string, transactions: [] }
+                      // Transaction structure: { id: number, type: 'budget' | 'expense', amount: number, date: string }
+        };
 
-    function removeTransaction(name, type, index) {
-        cardData[name][type].splice(index, 1);
-        updateCardTable(name);
-        updateAnalysis();
-        updateCharts();
-    }
+        let budgetChartInstance = null; // To hold the Chart.js instance
 
-    function updateAnalysis() {
-        const body = document.getElementById("analysisBody");
-        body.innerHTML = '';
-        for (let name in cardData) {
-            const totalBudget = cardData[name].budget.reduce((a, b) => a + b.amount, 0);
-            const totalExpense = cardData[name].expense.reduce((a, b) => a + b.amount, 0);
-            const remaining = totalBudget - totalExpense;
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${name}</td>
-                <td>₹${totalBudget}</td>
-                <td>₹${totalBudget}</td>
-                <td>₹${totalExpense}</td>
-                <td>₹${remaining}</td>
-                <td><button onclick="clearCardTransactions('${name}')">Clear</button></td>
-            `;
-            body.appendChild(row);
-        }
-    }
-
-    function clearCardTransactions(name) {
-        if (confirm(`Clear all transactions in "${name}"?`)) {
-            cardData[name].budget = [];
-            cardData[name].expense = [];
-            updateCardTable(name);
-            updateAnalysis();
-            updateCharts();
-        }
-    }
-
-    function updateCharts() {
-        const labels = Object.keys(cardData);
-        const budgetData = labels.map(name => cardData[name].budget.reduce((sum, t) => sum + t.amount, 0));
-        const expenseData = labels.map(name => cardData[name].expense.reduce((sum, t) => sum + t.amount, 0));
-
-        // Pie Chart
-        if (pieChart) pieChart.destroy();
-        pieChart = new Chart(document.getElementById("pieChart"), {
-            type: 'pie',
-            data: {
-                labels,
-                datasets: [{
-                    label: 'Expense Distribution',
-                    data: expenseData,
-                    backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71', '#3498db', '#9b59b6']
-                }]
+        // Load data from Local Storage on startup
+        function loadData() {
+            const storedData = localStorage.getItem('budgetAnalysisData');
+            if (storedData) {
+                budgetData = JSON.parse(storedData);
+                console.log("Data loaded from Local Storage.");
+            } else {
+                // Initialize with default cards if no data found
+                budgetData = {
+                    cards: [
+                        { id: 'card-edu', name: 'Education', transactions: [] },
+                        { id: 'card-hlt', name: 'Health', transactions: [] },
+                        { id: 'card-trp', name: 'Transport', transactions: [] },
+                        { id: 'card-fod', name: 'Food', transactions: [] },
+                        { id: 'card-inf', name: 'Infrastructure', transactions: [] }
+                    ]
+                };
+                console.log("Initialized with default data.");
+                saveData(); // Save the initial default data
             }
-        });
+             // Ensure transactions array exists for each card (backward compatibility)
+             budgetData.cards.forEach(card => {
+                 if (!card.transactions) {
+                     card.transactions = [];
+                 }
+             });
+        }
 
-        // Line Chart
-        const dateMap = {};
-        labels.forEach(name => {
-            [...cardData[name].budget, ...cardData[name].expense].forEach(entry => {
-                if (!dateMap[entry.date]) dateMap[entry.date] = { budget: 0, expense: 0 };
+        // Save data to Local Storage
+        function saveData() {
+            localStorage.setItem('budgetAnalysisData', JSON.stringify(budgetData));
+            console.log("Data saved to Local Storage.");
+        }
+
+        // --- PAGE NAVIGATION ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+
+        function navigateTo(pageId) {
+            // Hide all pages
+            pages.forEach(page => page.classList.remove('active'));
+            // Deactivate all nav links
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // Show the target page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+             // Activate the corresponding nav link
+            const targetLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+            if (targetLink) {
+                targetLink.classList.add('active');
+            }
+
+            // Refresh analysis page content when navigating to it
+            if (pageId === 'analysis-page') {
+                renderAnalysisPage();
+            }
+             // Refresh transaction page options when navigating to it
+            if (pageId === 'transaction-page') {
+                 renderTransactionPageOptions();
+            }
+             // Refresh home page when navigating to it
+             if (pageId === 'home-page') {
+                renderHomePage();
+            }
+        }
+
+        // Add event listeners to nav links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default anchor link behavior
+                const pageId = link.getAttribute('data-page');
+                navigateTo(pageId);
             });
         });
-        labels.forEach(name => {
-            cardData[name].budget.forEach(entry => dateMap[entry.date].budget += entry.amount);
-            cardData[name].expense.forEach(entry => dateMap[entry.date].expense += entry.amount);
-        });
-        const dates = Object.keys(dateMap).sort();
-        const budgetOverTime = dates.map(d => dateMap[d].budget);
-        const expenseOverTime = dates.map(d => dateMap[d].expense);
 
-        if (lineChart) lineChart.destroy();
-        lineChart = new Chart(document.getElementById("lineChart"), {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: [
-                    {
-                        label: 'Total Budget',
-                        data: budgetOverTime,
-                        borderColor: '#28a745',
-                        backgroundColor: '#28a74533',
-                        fill: true,
-                        tension: 0.3
+        // --- RENDERING FUNCTIONS ---
+
+        // Render cards on the Home page
+        function renderHomePage() {
+            const cardsContainer = document.getElementById('cards-container');
+            cardsContainer.innerHTML = ''; // Clear existing cards
+
+            if (budgetData.cards.length === 0) {
+                cardsContainer.innerHTML = '<p>No budget categories created yet. Add one below!</p>';
+                return;
+            }
+
+            budgetData.cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.setAttribute('data-card-id', card.id);
+
+                 // Calculate totals for display (optional on home page, maybe just transaction list)
+                 const totals = calculateTotals(card);
+
+                let transactionsHTML = '<p>No transactions yet.</p>';
+                if (card.transactions && card.transactions.length > 0) {
+                    transactionsHTML = '<ul class="transactions-list">';
+                    // Sort transactions by date, newest first
+                    const sortedTransactions = [...card.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                    sortedTransactions.forEach(tx => {
+                        const amountClass = tx.type === 'budget' ? 'budget' : 'expense';
+                        const sign = tx.type === 'budget' ? '+' : '-';
+                        transactionsHTML += `
+                            <li>
+                                <span class="transaction-details">
+                                    ${tx.date}: ${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}
+                                </span>
+                                <span class="transaction-amount ${amountClass}">
+                                     ${sign}₹${tx.amount.toFixed(2)}
+                                </span>
+                                <button class="delete-transaction-btn" data-transaction-id="${tx.id}" title="Delete Transaction">X</button>
+                            </li>
+                        `;
+                    });
+                     transactionsHTML += '</ul>';
+                }
+
+
+                cardElement.innerHTML = `
+                    <h5>${card.name}</h5>
+                    <p>Budget: ₹${totals.totalBudget.toFixed(2)} | Expenses: ₹${totals.totalExpenses.toFixed(2)} </p>
+                    <h6>Recent Transactions:</h6>
+                    ${transactionsHTML}
+                `;
+                cardsContainer.appendChild(cardElement);
+            });
+        }
+
+        // Render options in the transaction category dropdown
+        function renderTransactionPageOptions() {
+            const categorySelect = document.getElementById('transaction-category');
+            categorySelect.innerHTML = '<option value="">-- Select Category --</option>'; // Clear existing options
+
+            budgetData.cards.forEach(card => {
+                const option = document.createElement('option');
+                option.value = card.id;
+                option.textContent = card.name;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Render the analysis table, update chart, and generate AI report
+        function renderAnalysisPage() {
+            renderAnalysisTable();
+            updateBudgetChart();
+            generateAIReport();
+        }
+
+        // Render the Analysis Table
+        function renderAnalysisTable() {
+             const tableBody = document.getElementById('analysis-table-body');
+             tableBody.innerHTML = ''; // Clear existing rows
+
+             if (budgetData.cards.length === 0) {
+                 tableBody.innerHTML = '<tr><td colspan="4">No data available. Add categories and transactions.</td></tr>';
+                 return;
+             }
+
+             let overallBudget = 0;
+             let overallExpenses = 0;
+
+             budgetData.cards.forEach(card => {
+                 const totals = calculateTotals(card);
+                 const remaining = totals.totalBudget - totals.totalExpenses;
+
+                 overallBudget += totals.totalBudget;
+                 overallExpenses += totals.totalExpenses;
+
+                 const row = document.createElement('tr');
+                 row.innerHTML = `
+                     <td>${card.name}</td>
+                     <td>₹${totals.totalBudget.toFixed(2)}</td>
+                     <td>₹${totals.totalExpenses.toFixed(2)}</td>
+                     <td>₹${remaining.toFixed(2)}</td>
+                 `;
+                 tableBody.appendChild(row);
+             });
+
+             // Add Overall Total Row
+             const totalRow = document.createElement('tr');
+             totalRow.style.fontWeight = 'bold';
+             totalRow.style.backgroundColor = '#e9ecef';
+             totalRow.innerHTML = `
+                 <td><strong>Overall Total</strong></td>
+                 <td><strong>₹${overallBudget.toFixed(2)}</strong></td>
+                 <td><strong>₹${overallExpenses.toFixed(2)}</strong></td>
+                 <td><strong>₹${(overallBudget - overallExpenses).toFixed(2)}</strong></td>
+             `;
+             tableBody.appendChild(totalRow);
+        }
+
+
+        // Update the Budget Chart using Chart.js
+        function updateBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+
+            // Destroy previous chart instance if it exists
+             if (budgetChartInstance) {
+                 budgetChartInstance.destroy();
+             }
+
+             if (budgetData.cards.length === 0) {
+                 // Optionally display a message if no data
+                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // Clear canvas
+                 ctx.font = "16px Arial";
+                 ctx.fillStyle = "#666";
+                 ctx.textAlign = "center";
+                 ctx.fillText("No data to display chart.", ctx.canvas.width / 2, ctx.canvas.height / 2);
+                 return;
+             }
+
+            const labels = budgetData.cards.map(card => card.name);
+            const budgetAmounts = budgetData.cards.map(card => calculateTotals(card).totalBudget);
+            const expenseAmounts = budgetData.cards.map(card => calculateTotals(card).totalExpenses);
+
+            budgetChartInstance = new Chart(ctx, {
+                type: 'bar', // Type of chart (bar, line, pie, etc.)
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total Budget Allocated (₹)',
+                            data: budgetAmounts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)', // Greenish
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Total Expenses (₹)',
+                            data: expenseAmounts,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)', // Reddish
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Adjust as needed
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                             ticks: {
+                                 callback: function(value) {
+                                     return '₹' + value; // Add currency symbol
+                                 }
+                             }
+                        }
                     },
-                    {
-                        label: 'Total Expenses',
-                        data: expenseOverTime,
-                        borderColor: '#dc3545',
-                        backgroundColor: '#dc354533',
-                        fill: true,
-                        tension: 0.3
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Budget vs Expenses Over Time'
+                    plugins: {
+                        tooltip: {
+                             callbacks: {
+                                 label: function(context) {
+                                     let label = context.dataset.label || '';
+                                     if (label) {
+                                         label += ': ';
+                                     }
+                                     if (context.parsed.y !== null) {
+                                         label += '₹' + context.parsed.y.toFixed(2);
+                                     }
+                                     return label;
+                                 }
+                             }
+                         }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    renderCards();
-    showPage('home');
-</script>
+         // --- "AI" Analysis Report Generation (Simulation) ---
+         function generateAIReport() {
+             const reportContainer = document.getElementById('ai-report');
+             let report = "Budget Analysis Report:\n------------------------\n";
+
+             if (budgetData.cards.length === 0) {
+                 report += "No categories defined. Please add budget categories and transactions for analysis.";
+                 reportContainer.textContent = report;
+                 return;
+             }
+
+             let totalBudget = 0;
+             let totalExpenses = 0;
+             let highestExpense = { name: 'N/A', amount: 0 };
+             let expensesExist = false;
+
+             budgetData.cards.forEach(card => {
+                 const totals = calculateTotals(card);
+                 totalBudget += totals.totalBudget;
+                 totalExpenses += totals.totalExpenses;
+                 if (totals.totalExpenses > 0) expensesExist = true;
+
+                 if (totals.totalExpenses > highestExpense.amount) {
+                     highestExpense = { name: card.name, amount: totals.totalExpenses };
+                 }
+             });
+
+             const overallBalance = totalBudget - totalExpenses;
+
+             report += `Overall Status:\n`;
+             report += `- Total Budget Allocated: ₹${totalBudget.toFixed(2)}\n`;
+             report += `- Total Expenses: ₹${totalExpenses.toFixed(2)}\n`;
+             report += `- Overall Balance: ₹${overallBalance.toFixed(2)}\n\n`;
+
+             if (totalExpenses > 0) {
+                 report += `Spending Insights:\n`;
+                 report += `- Highest spending category: "${highestExpense.name}" (₹${highestExpense.amount.toFixed(2)})\n`;
+                 const expensePercentage = totalBudget > 0 ? (totalExpenses / totalBudget * 100) : 0;
+                 if (totalBudget > 0) {
+                    report += `- You have spent ${expensePercentage.toFixed(1)}% of your total allocated budget.\n`;
+                 } else if (totalExpenses > 0) {
+                     report += `- Expenses recorded, but no budget allocated for comparison.\n`;
+                 }
+
+                 // Simple Recommendations (Simulated AI)
+                 report += `\nRecommendations:\n`;
+                 if (overallBalance < 0) {
+                     report += `- Alert: You are over budget by ₹${Math.abs(overallBalance).toFixed(2)}. Review spending, especially in the "${highestExpense.name}" category.\n`;
+                 } else if (expensePercentage > 85 && totalBudget > 0) {
+                     report += `- Warning: Spending is high (${expensePercentage.toFixed(1)}% of budget). Monitor expenses closely.\n`;
+                 } else if (totalExpenses == 0 && totalBudget > 0){
+                     report += `- You have allocated budget but not recorded any expenses yet.\n`;
+                 } else if (!expensesExist) {
+                     report += `- No expenses recorded yet. Start adding transactions to track your spending.\n`;
+                 }
+                 else {
+                     report += `- Good job! Your spending is currently within the allocated budget.\n`;
+                 }
+                  if (highestExpense.amount > totalBudget * 0.5 && totalBudget > 0) { // If one category is > 50% of total budget
+                     report += `- Consider evaluating the budget allocation for the "${highestExpense.name}" category, as it constitutes a significant portion of your expenses.\n`;
+                 }
+
+             } else {
+                 report += "No expenses recorded yet. Add transactions to get spending insights and recommendations.\n";
+             }
+
+             reportContainer.textContent = report;
+         }
+
+
+        // --- CORE LOGIC FUNCTIONS ---
+
+        // Calculate totals for a specific card
+        function calculateTotals(card) {
+            let totalBudget = 0;
+            let totalExpenses = 0;
+
+            if (card.transactions) {
+                card.transactions.forEach(tx => {
+                    if (tx.type === 'budget') {
+                        totalBudget += tx.amount;
+                    } else if (tx.type === 'expense') {
+                        totalExpenses += tx.amount;
+                    }
+                });
+            }
+            return { totalBudget, totalExpenses };
+        }
+
+
+        // Add a new budget category card
+        function addCard() {
+            const cardNameInput = document.getElementById('new-card-name');
+            const cardName = cardNameInput.value.trim();
+
+            if (!cardName) {
+                alert('Please enter a name for the new category card.');
+                return;
+            }
+
+            // Check if card name already exists (case-insensitive)
+            const nameExists = budgetData.cards.some(card => card.name.toLowerCase() === cardName.toLowerCase());
+            if (nameExists) {
+                 alert(`A category card with the name "${cardName}" already exists.`);
+                 return;
+            }
+
+
+            const newCard = {
+                id: 'card-' + Date.now() + Math.random().toString(16).slice(2), // More unique ID
+                name: cardName,
+                transactions: []
+            };
+
+            budgetData.cards.push(newCard);
+            saveData();
+
+            cardNameInput.value = ''; // Clear input field
+            renderHomePage(); // Update the home page display
+            renderTransactionPageOptions(); // Update dropdown on transaction page
+            renderAnalysisPage(); // Update analysis page
+            alert(`Category "${cardName}" added successfully!`);
+        }
+
+        // Add a transaction (budget or expense)
+        function addTransaction(event) {
+            event.preventDefault(); // Prevent form from submitting the traditional way
+
+            const type = document.getElementById('transaction-type').value;
+            const categoryId = document.getElementById('transaction-category').value;
+            const amountInput = document.getElementById('transaction-amount');
+            const dateInput = document.getElementById('transaction-date');
+
+            const amount = parseFloat(amountInput.value);
+            const date = dateInput.value;
+
+            // Validation
+            if (!type || !categoryId || !amount || amount <= 0 || !date) {
+                alert('Please fill in all transaction details correctly.');
+                return;
+            }
+
+            const targetCard = budgetData.cards.find(card => card.id === categoryId);
+
+            if (!targetCard) {
+                alert('Selected category not found. Please refresh or select a valid category.');
+                return;
+            }
+
+             // Ensure transactions array exists
+             if (!targetCard.transactions) {
+                 targetCard.transactions = [];
+             }
+
+            const newTransaction = {
+                id: Date.now(), // Simple timestamp ID for transaction
+                type: type,
+                amount: amount,
+                date: date
+            };
+
+            targetCard.transactions.push(newTransaction);
+            saveData();
+
+            // Clear the form
+            // document.getElementById('transaction-form').reset(); // This also resets dropdowns, maybe clear individually
+             amountInput.value = '';
+             dateInput.value = '';
+             document.getElementById('transaction-category').selectedIndex = 0; // Reset category dropdown
+             document.getElementById('transaction-type').selectedIndex = 0; // Reset type dropdown
+
+
+            alert(`Transaction added successfully to "${targetCard.name}"!`);
+
+            // Update UI - Render relevant sections again
+            renderHomePage();
+            renderAnalysisPage(); // Update table, chart, and AI report
+        }
+
+         // Delete a specific transaction
+         function deleteTransaction(cardId, transactionId) {
+             const card = budgetData.cards.find(c => c.id === cardId);
+             if (!card || !card.transactions) return;
+
+             const transactionIndex = card.transactions.findIndex(tx => tx.id === transactionId);
+
+             if (transactionIndex > -1) {
+                 const deletedTx = card.transactions.splice(transactionIndex, 1)[0]; // Remove the transaction
+                 saveData();
+                 console.log("Deleted transaction:", deletedTx);
+                 // Re-render affected areas
+                 renderHomePage(); // Update the card's list
+                 renderAnalysisPage(); // Update totals and analysis
+                 alert('Transaction deleted successfully.');
+             } else {
+                 console.error("Transaction not found for deletion:", transactionId);
+                 alert('Error: Could not find the transaction to delete.');
+             }
+         }
+
+
+        // --- INITIALIZATION & EVENT LISTENERS ---
+
+        function initialize() {
+            loadData(); // Load existing data or defaults
+
+            // Setup Navigation Listeners (already done above)
+
+            // Setup Form Submission Listener
+            const transactionForm = document.getElementById('transaction-form');
+            if(transactionForm) {
+                transactionForm.addEventListener('submit', addTransaction);
+            } else {
+                 console.error("Transaction form not found!");
+            }
+
+
+            // Setup "Add Card" Button Listener
+            const addCardBtn = document.getElementById('add-card-btn');
+             if(addCardBtn) {
+                addCardBtn.addEventListener('click', addCard);
+             } else {
+                  console.error("Add card button not found!");
+             }
+
+            // Setup Event Delegation for Deleting Transactions
+            const cardsContainer = document.getElementById('cards-container');
+             if(cardsContainer) {
+                cardsContainer.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('delete-transaction-btn')) {
+                         const button = event.target;
+                         const transactionId = parseInt(button.getAttribute('data-transaction-id'), 10); // Ensure it's a number
+                         // Find the parent card element to get the cardId
+                         const cardElement = button.closest('.card');
+                         if (cardElement) {
+                             const cardId = cardElement.getAttribute('data-card-id');
+                             if (cardId && !isNaN(transactionId)) {
+                                 // Optional: Add confirmation
+                                 if (confirm('Are you sure you want to delete this transaction?')) {
+                                     deleteTransaction(cardId, transactionId);
+                                 }
+                             } else {
+                                 console.error("Could not find card ID or transaction ID for deletion.");
+                             }
+                         } else {
+                             console.error("Could not find parent card element for delete button.");
+                         }
+                    }
+                });
+             } else {
+                 console.error("Cards container not found for event delegation!");
+             }
+
+
+            // Initial Render
+            renderHomePage();
+            renderTransactionPageOptions(); // Populate dropdown initially
+            // Analysis page renders when navigated to, but could pre-render if desired
+            // renderAnalysisPage();
+
+             // Set the default active page (Home)
+             navigateTo('home-page');
+        }
+
+        // Run initialization when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initialize);
+
+    </script>
 
 </body>
 </html>
