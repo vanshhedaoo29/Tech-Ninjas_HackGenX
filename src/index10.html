@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Budget Allocation</title>
+    <title>Budget Analysis</title>
     <!-- Include Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -57,7 +58,8 @@
 
         /* Main Content Area */
         main {
-            flex: 1; /* Takes up remaining vertical space */
+            flex: 1;
+            /* Takes up remaining vertical space */
             padding: 1.5rem;
             max-width: 1200px;
             margin: 1rem auto;
@@ -66,25 +68,33 @@
 
         /* Page Visibility Control */
         .page {
-            display: none; /* Hide pages by default */
+            display: none;
+            /* Hide pages by default */
             animation: fadeIn 0.5s ease-in-out;
         }
 
         .page.active {
-            display: block; /* Show active page */
+            display: block;
+            /* Show active page */
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         /* Home Page - Cards */
-         #home-page h4 {
+        #home-page h4 {
             margin-bottom: 1rem;
             border-bottom: 2px solid #ddd;
             padding-bottom: 0.5rem;
-         }
+        }
+
         #cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -97,7 +107,8 @@
             padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            overflow: hidden; /* Contain floats/margins */
+            overflow: hidden;
+            /* Contain floats/margins */
         }
 
         .card h5 {
@@ -110,7 +121,8 @@
         .card .transactions-list {
             list-style: none;
             padding: 0;
-            max-height: 150px; /* Limit height and add scroll */
+            max-height: 150px;
+            /* Limit height and add scroll */
             overflow-y: auto;
             margin-top: 1rem;
             font-size: 0.9em;
@@ -123,17 +135,20 @@
             padding: 0.4rem 0;
             border-bottom: 1px dotted #eee;
         }
-         .card .transactions-list li:last-child {
+
+        .card .transactions-list li:last-child {
             border-bottom: none;
-         }
+        }
 
         .card .transactions-list .transaction-details {
             flex-grow: 1;
             margin-right: 10px;
         }
+
         .card .transactions-list .transaction-amount.budget {
             color: green;
         }
+
         .card .transactions-list .transaction-amount.expense {
             color: red;
         }
@@ -147,6 +162,7 @@
             cursor: pointer;
             font-size: 0.8em;
         }
+
         .card .transactions-list .delete-transaction-btn:hover {
             background: #c82333;
         }
@@ -160,17 +176,18 @@
         }
 
         #add-card-section input[type="text"] {
-             padding: 0.6rem;
-             margin-right: 0.5rem;
-             border: 1px solid #ccc;
-             border-radius: 4px;
+            padding: 0.6rem;
+            margin-right: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
         /* Transaction Page - Form */
-        #transaction-page h4, #analysis-page h4 {
-             margin-bottom: 1.5rem;
-             border-bottom: 2px solid #ddd;
-             padding-bottom: 0.5rem;
+        #transaction-page h4,
+        #analysis-page h4 {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
         }
 
         #transaction-form label {
@@ -190,24 +207,27 @@
         }
 
         #transaction-form button {
-             display: inline-block;
-             padding: 0.8rem 1.5rem;
-             background: #28a745; /* Green */
-             color: white;
-             border: none;
-             border-radius: 4px;
-             cursor: pointer;
-             transition: background-color 0.3s ease;
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: #28a745;
+            /* Green */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-         #transaction-form button:hover {
-             background: #218838;
-         }
+
+        #transaction-form button:hover {
+            background: #218838;
+        }
 
 
         /* Analysis Page */
         #analysis-table-container {
             margin-bottom: 2rem;
-            overflow-x: auto; /* Allow horizontal scrolling on small screens */
+            overflow-x: auto;
+            /* Allow horizontal scrolling on small screens */
         }
 
         #analysis-table {
@@ -215,7 +235,7 @@
             border-collapse: collapse;
             margin-bottom: 1.5rem;
             background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         #analysis-table th,
@@ -235,40 +255,44 @@
         }
 
         #chart-container {
+            height: 800px;
+            width: 850px;
             background: #fff;
             padding: 1.5rem;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
-            width: 700px;
-            height: 700px;
         }
-         #chart-container h5 {
+
+        #chart-container h5 {
             text-align: center;
             margin-bottom: 1rem;
             color: #333;
-         }
+        }
 
         #ai-report-container {
-             background: #eef;
-             padding: 1.5rem;
-             border-radius: 8px;
-             border: 1px solid #cce;
+            background: #eef;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #cce;
         }
-         #ai-report-container h5 {
-             margin-bottom: 1rem;
-             color: #0056b3;
-         }
-         #ai-report {
-             white-space: pre-wrap; /* Preserve formatting */
-             font-family: Consolas, Monaco, monospace;
-             font-size: 0.95em;
-             background-color: #f8f9fa;
-             padding: 1rem;
-             border: 1px dashed #ccc;
-             border-radius: 4px;
-             min-height: 100px;
-         }
+
+        #ai-report-container h5 {
+            margin-bottom: 1rem;
+            color: #0056b3;
+        }
+
+        #ai-report {
+            white-space: pre-wrap;
+            /* Preserve formatting */
+            font-family: Consolas, Monaco, monospace;
+            font-size: 0.95em;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            min-height: 100px;
+        }
 
 
         /* Footer */
@@ -293,21 +317,25 @@
             text-decoration: none;
             transition: background-color 0.3s ease;
         }
+
         .button:hover {
             background: #0056b3;
         }
+
         .button-danger {
-             background: #dc3545;
+            background: #dc3545;
         }
+
         .button-danger:hover {
-             background: #c82333;
+            background: #c82333;
         }
     </style>
 </head>
+
 <body>
 
     <header>
-        <h3>Budget Allocation Dashboard</h3>
+        <h3>Budget Analysis Dashboard</h3>
         <nav>
             <a href="#home" data-page="home-page" class="nav-link active">Home</a>
             <a href="#transaction" data-page="transaction-page" class="nav-link">Transaction</a>
@@ -343,18 +371,19 @@
                         <option value="expense">Expense (Debit)</option>
                     </select>
                 </div>
-                 <div>
+                <div>
                     <label for="transaction-category">Category:</label>
                     <select id="transaction-category" required>
                         <!-- Options will be loaded here by JavaScript -->
-                         <option value="">-- Select Category --</option>
+                        <option value="">-- Select Category --</option>
                     </select>
                 </div>
-                 <div>
+                <div>
                     <label for="transaction-amount">Amount (₹):</label>
-                    <input type="number" id="transaction-amount" min="0.01" step="0.01" placeholder="e.g., 500.00" required>
+                    <input type="number" id="transaction-amount" min="0.01" step="0.01" placeholder="e.g., 500.00"
+                        required>
                 </div>
-                 <div>
+                <div>
                     <label for="transaction-date">Date:</label>
                     <input type="date" id="transaction-date" required>
                 </div>
@@ -367,7 +396,7 @@
             <h4>Budget Summary & Analysis</h4>
 
             <div id="analysis-table-container">
-                 <h5>Summary Table</h5>
+                <h5>Summary Table</h5>
                 <table id="analysis-table">
                     <thead>
                         <tr>
@@ -379,39 +408,41 @@
                     </thead>
                     <tbody id="analysis-table-body">
                         <!-- Table rows will be loaded here by JavaScript -->
-                        <tr><td colspan="4">Loading analysis data...</td></tr>
+                        <tr>
+                            <td colspan="4">Loading analysis data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
-             <div id="chart-container">
-                 <h5>Budget vs. Expenses Graph</h5>
-                 <canvas id="budgetChart"></canvas>
-             </div>
+            <div id="chart-container">
+                <h5>Budget vs. Expenses Graph</h5>
+                <canvas id="budgetChart"></canvas>
+            </div>
 
-             <div id="ai-report-container">
-                  <h5>AI Budget Analysis Report</h5>
-                  <div id="ai-report">
-                      Generating analysis... please add some transactions.
-                  </div>
-             </div>
+            <div id="ai-report-container">
+                <h5>AI Budget Analysis Report</h5>
+                <div id="ai-report">
+                    Generating analysis... please add some transactions.
+                </div>
+            </div>
 
         </section>
 
     </main>
 
     <footer>
-        <p>&copy; 2025 Smart Budget Allocation System. All rights reserved.</p>
+        <p>&copy; 2023 Budget Analysis Tool. All rights reserved.</p>
     </footer>
 
     <script>
         // --- DATA STORAGE & MANAGEMENT ---
         let budgetData = {
             cards: [] // Structure: { id: string, name: string, transactions: [] }
-                      // Transaction structure: { id: number, type: 'budget' | 'expense', amount: number, date: string }
+            // Transaction structure: { id: number, type: 'budget' | 'expense', amount: number, date: string }
         };
 
-        let budgetChartInstance = null; // To hold the Chart.js instance
+        // To hold the Chart.js instance
 
         // Load data from Local Storage on startup
         function loadData() {
@@ -433,12 +464,12 @@
                 console.log("Initialized with default data.");
                 saveData(); // Save the initial default data
             }
-             // Ensure transactions array exists for each card (backward compatibility)
-             budgetData.cards.forEach(card => {
-                 if (!card.transactions) {
-                     card.transactions = [];
-                 }
-             });
+            // Ensure transactions array exists for each card (backward compatibility)
+            budgetData.cards.forEach(card => {
+                if (!card.transactions) {
+                    card.transactions = [];
+                }
+            });
         }
 
         // Save data to Local Storage
@@ -463,7 +494,7 @@
                 targetPage.classList.add('active');
             }
 
-             // Activate the corresponding nav link
+            // Activate the corresponding nav link
             const targetLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
             if (targetLink) {
                 targetLink.classList.add('active');
@@ -473,12 +504,12 @@
             if (pageId === 'analysis-page') {
                 renderAnalysisPage();
             }
-             // Refresh transaction page options when navigating to it
+            // Refresh transaction page options when navigating to it
             if (pageId === 'transaction-page') {
-                 renderTransactionPageOptions();
+                renderTransactionPageOptions();
             }
-             // Refresh home page when navigating to it
-             if (pageId === 'home-page') {
+            // Refresh home page when navigating to it
+            if (pageId === 'home-page') {
                 renderHomePage();
             }
         }
@@ -509,8 +540,8 @@
                 cardElement.classList.add('card');
                 cardElement.setAttribute('data-card-id', card.id);
 
-                 // Calculate totals for display (optional on home page, maybe just transaction list)
-                 const totals = calculateTotals(card);
+                // Calculate totals for display (optional on home page, maybe just transaction list)
+                const totals = calculateTotals(card);
 
                 let transactionsHTML = '<p>No transactions yet.</p>';
                 if (card.transactions && card.transactions.length > 0) {
@@ -533,7 +564,7 @@
                             </li>
                         `;
                     });
-                     transactionsHTML += '</ul>';
+                    transactionsHTML += '</ul>';
                 }
 
 
@@ -569,193 +600,324 @@
 
         // Render the Analysis Table
         function renderAnalysisTable() {
-             const tableBody = document.getElementById('analysis-table-body');
-             tableBody.innerHTML = ''; // Clear existing rows
+            const tableBody = document.getElementById('analysis-table-body');
+            tableBody.innerHTML = ''; // Clear existing rows
 
-             if (budgetData.cards.length === 0) {
-                 tableBody.innerHTML = '<tr><td colspan="4">No data available. Add categories and transactions.</td></tr>';
-                 return;
-             }
+            if (budgetData.cards.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4">No data available. Add categories and transactions.</td></tr>';
+                return;
+            }
 
-             let overallBudget = 0;
-             let overallExpenses = 0;
+            let overallBudget = 0;
+            let overallExpenses = 0;
 
-             budgetData.cards.forEach(card => {
-                 const totals = calculateTotals(card);
-                 const remaining = totals.totalBudget - totals.totalExpenses;
+            budgetData.cards.forEach(card => {
+                const totals = calculateTotals(card);
+                const remaining = totals.totalBudget - totals.totalExpenses;
 
-                 overallBudget += totals.totalBudget;
-                 overallExpenses += totals.totalExpenses;
+                overallBudget += totals.totalBudget;
+                overallExpenses += totals.totalExpenses;
 
-                 const row = document.createElement('tr');
-                 row.innerHTML = `
+                const row = document.createElement('tr');
+                row.innerHTML = `
                      <td>${card.name}</td>
                      <td>₹${totals.totalBudget.toFixed(2)}</td>
                      <td>₹${totals.totalExpenses.toFixed(2)}</td>
                      <td>₹${remaining.toFixed(2)}</td>
                  `;
-                 tableBody.appendChild(row);
-             });
+                tableBody.appendChild(row);
+            });
 
-             // Add Overall Total Row
-             const totalRow = document.createElement('tr');
-             totalRow.style.fontWeight = 'bold';
-             totalRow.style.backgroundColor = '#e9ecef';
-             totalRow.innerHTML = `
+            // Add Overall Total Row
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.style.backgroundColor = '#e9ecef';
+            totalRow.innerHTML = `
                  <td><strong>Overall Total</strong></td>
                  <td><strong>₹${overallBudget.toFixed(2)}</strong></td>
                  <td><strong>₹${overallExpenses.toFixed(2)}</strong></td>
                  <td><strong>₹${(overallBudget - overallExpenses).toFixed(2)}</strong></td>
              `;
-             tableBody.appendChild(totalRow);
+            tableBody.appendChild(totalRow);
         }
 
 
-        // Update the Budget Chart using Chart.js
+        // ensure this is global
+
+        let budgetChartInstance = null;
+
         function updateBudgetChart() {
-            const ctx = document.getElementById('budgetChart').getContext('2d');
+            const canvas = document.getElementById('budgetChart');
+            if (!canvas) {
+                console.error('Budget chart canvas not found');
+                return;
+            }
 
-            // Destroy previous chart instance if it exists
-             if (budgetChartInstance) {
-                 budgetChartInstance.destroy();
-             }
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Could not get canvas context');
+                return;
+            }
 
-             if (budgetData.cards.length === 0) {
-                 // Optionally display a message if no data
-                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // Clear canvas
-                 ctx.font = "16px Arial";
-                 ctx.fillStyle = "#666";
-                 ctx.textAlign = "center";
-                 ctx.fillText("No data to display chart.", ctx.canvas.width / 2, ctx.canvas.height / 2);
-                 return;
-             }
+            // Destroy previous chart if it exists
+            if (budgetChartInstance) {
+                budgetChartInstance.destroy();
+                budgetChartInstance = null;
+            }
 
-            const labels = budgetData.cards.map(card => card.name);
-            const budgetAmounts = budgetData.cards.map(card => calculateTotals(card).totalBudget);
-            const expenseAmounts = budgetData.cards.map(card => calculateTotals(card).totalExpenses);
+            // Check if there is any valid budget data
+            if (!budgetData || !Array.isArray(budgetData.cards) || budgetData.cards.length === 0) {
+                drawNoDataMessage(ctx, canvas);
+                return;
+            }
+
+            // Filter out invalid cards and prepare data
+            const validCards = budgetData.cards.filter(card =>
+                card && typeof card.name === 'string' && card.name.trim() !== ''
+            );
+
+            if (validCards.length === 0) {
+                drawNoDataMessage(ctx, canvas);
+                return;
+            }
+
+            // Prepare data for chart
+            const { labels, budgetAmounts, expenseAmounts, remainingAmounts } = prepareChartData(validCards);
+
+            // Create the new chart
+            createBudgetChart(ctx, labels, budgetAmounts, expenseAmounts, remainingAmounts);
+        }
+
+        function drawNoDataMessage(ctx, canvas) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "center";
+            ctx.fillText("No budget data available to display.", canvas.width / 2, canvas.height / 2);
+        }
+
+        function prepareChartData(cards) {
+            const labels = [];
+            const budgetAmounts = [];
+            const expenseAmounts = [];
+            const remainingAmounts = [];
+
+            cards.forEach(card => {
+                labels.push(card.name || 'Unnamed Budget');
+
+                const totals = calculateTotals(card) || {};
+                const budget = parseFloat(totals.totalBudget) || 0;
+                const expenses = parseFloat(totals.totalExpenses) || 0;
+
+                budgetAmounts.push(budget);
+                expenseAmounts.push(expenses);
+                remainingAmounts.push(budget - expenses);
+            });
+
+            return { labels, budgetAmounts, expenseAmounts, remainingAmounts };
+        }
+
+        function createBudgetChart(ctx, labels, budgetAmounts, expenseAmounts, remainingAmounts) {
+            // Set canvas dimensions for better rendering
+            ctx.canvas.width = ctx.canvas.offsetWidth;
+            ctx.canvas.height = ctx.canvas.offsetHeight || 400; // Default height if not set
 
             budgetChartInstance = new Chart(ctx, {
-                type: 'bar', // Type of chart (bar, line, pie, etc.)
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Total Budget Allocated (₹)',
+                            label: 'Budget Allocated',
                             data: budgetAmounts,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)', // Greenish
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barPercentage: 0.6
                         },
                         {
-                            label: 'Total Expenses (₹)',
+                            label: 'Expenses',
                             data: expenseAmounts,
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)', // Reddish
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
                             borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Remaining',
+                            data: remainingAmounts,
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            barPercentage: 0.6,
+                            hidden: true // Hide by default but can be toggled
                         }
                     ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Adjust as needed
+                    maintainAspectRatio: false,
                     scales: {
+                        x: {
+                            stacked: false,
+                            grid: {
+                                display: false
+                            }
+                        },
                         y: {
                             beginAtZero: true,
-                             ticks: {
-                                 callback: function(value) {
-                                     return '₹' + value; // Add currency symbol
-                                 }
-                             }
+                            grace: '5%',
+                            stacked: false,
+                            ticks: {
+                                callback: function (value) {
+                                    return '₹' + value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
                         }
                     },
                     plugins: {
+                        title: {
+                            display: true,
+                            text: 'Budget vs Expenses Comparison',
+                            font: {
+                                size: 16
+                            }
+                        },
                         tooltip: {
-                             callbacks: {
-                                 label: function(context) {
-                                     let label = context.dataset.label || '';
-                                     if (label) {
-                                         label += ': ';
-                                     }
-                                     if (context.parsed.y !== null) {
-                                         label += '₹' + context.parsed.y.toFixed(2);
-                                     }
-                                     return label;
-                                 }
-                             }
-                         }
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    label += '₹' + context.parsed.y.toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+
+                                    // Add percentage for budget and expenses
+                                    if (context.datasetIndex < 2) {
+                                        const total = context.datasetIndex === 0
+                                            ? budgetAmounts[context.dataIndex]
+                                            : expenseAmounts[context.dataIndex];
+                                        const percentage = total > 0
+                                            ? (context.parsed.y / total * 100).toFixed(1) + '%'
+                                            : '0%';
+                                        label += ` (${percentage})`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            onClick: function (e, legendItem, legend) {
+                                const index = legendItem.datasetIndex;
+                                const ci = legend.chart;
+                                const meta = ci.getDatasetMeta(index);
+
+                                // See controller.isDatasetVisible comment
+                                meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+
+                                // We hid a dataset ... rerender the chart
+                                ci.update();
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     }
                 }
             });
         }
 
-         // --- "AI" Analysis Report Generation (Simulation) ---
-         function generateAIReport() {
-             const reportContainer = document.getElementById('ai-report');
-             let report = "Budget Analysis Report:\n------------------------\n";
+        // --- "AI" Analysis Report Generation (Simulation) ---
+        function generateAIReport() {
+            const reportContainer = document.getElementById('ai-report');
+            let report = "Budget Analysis Report:\n------------------------\n";
 
-             if (budgetData.cards.length === 0) {
-                 report += "No categories defined. Please add budget categories and transactions for analysis.";
-                 reportContainer.textContent = report;
-                 return;
-             }
+            if (budgetData.cards.length === 0) {
+                report += "No categories defined. Please add budget categories and transactions for analysis.";
+                reportContainer.textContent = report;
+                return;
+            }
 
-             let totalBudget = 0;
-             let totalExpenses = 0;
-             let highestExpense = { name: 'N/A', amount: 0 };
-             let expensesExist = false;
+            let totalBudget = 0;
+            let totalExpenses = 0;
+            let highestExpense = { name: 'N/A', amount: 0 };
+            let expensesExist = false;
 
-             budgetData.cards.forEach(card => {
-                 const totals = calculateTotals(card);
-                 totalBudget += totals.totalBudget;
-                 totalExpenses += totals.totalExpenses;
-                 if (totals.totalExpenses > 0) expensesExist = true;
+            budgetData.cards.forEach(card => {
+                const totals = calculateTotals(card);
+                totalBudget += totals.totalBudget;
+                totalExpenses += totals.totalExpenses;
+                if (totals.totalExpenses > 0) expensesExist = true;
 
-                 if (totals.totalExpenses > highestExpense.amount) {
-                     highestExpense = { name: card.name, amount: totals.totalExpenses };
-                 }
-             });
+                if (totals.totalExpenses > highestExpense.amount) {
+                    highestExpense = { name: card.name, amount: totals.totalExpenses };
+                }
+            });
 
-             const overallBalance = totalBudget - totalExpenses;
+            const overallBalance = totalBudget - totalExpenses;
 
-             report += `Overall Status:\n`;
-             report += `- Total Budget Allocated: ₹${totalBudget.toFixed(2)}\n`;
-             report += `- Total Expenses: ₹${totalExpenses.toFixed(2)}\n`;
-             report += `- Overall Balance: ₹${overallBalance.toFixed(2)}\n\n`;
+            report += `Overall Status:\n`;
+            report += `- Total Budget Allocated: ₹${totalBudget.toFixed(2)}\n`;
+            report += `- Total Expenses: ₹${totalExpenses.toFixed(2)}\n`;
+            report += `- Overall Balance: ₹${overallBalance.toFixed(2)}\n\n`;
 
-             if (totalExpenses > 0) {
-                 report += `Spending Insights:\n`;
-                 report += `- Highest spending category: "${highestExpense.name}" (₹${highestExpense.amount.toFixed(2)})\n`;
-                 const expensePercentage = totalBudget > 0 ? (totalExpenses / totalBudget * 100) : 0;
-                 if (totalBudget > 0) {
+            if (totalExpenses > 0) {
+                report += `Spending Insights:\n`;
+                report += `- Highest spending category: "${highestExpense.name}" (₹${highestExpense.amount.toFixed(2)})\n`;
+                const expensePercentage = totalBudget > 0 ? (totalExpenses / totalBudget * 100) : 0;
+                if (totalBudget > 0) {
                     report += `- You have spent ${expensePercentage.toFixed(1)}% of your total allocated budget.\n`;
-                 } else if (totalExpenses > 0) {
-                     report += `- Expenses recorded, but no budget allocated for comparison.\n`;
-                 }
+                } else if (totalExpenses > 0) {
+                    report += `- Expenses recorded, but no budget allocated for comparison.\n`;
+                }
 
-                 // Simple Recommendations (Simulated AI)
-                 report += `\nRecommendations:\n`;
-                 if (overallBalance < 0) {
-                     report += `- Alert: You are over budget by ₹${Math.abs(overallBalance).toFixed(2)}. Review spending, especially in the "${highestExpense.name}" category.\n`;
-                 } else if (expensePercentage > 85 && totalBudget > 0) {
-                     report += `- Warning: Spending is high (${expensePercentage.toFixed(1)}% of budget). Monitor expenses closely.\n`;
-                 } else if (totalExpenses == 0 && totalBudget > 0){
-                     report += `- You have allocated budget but not recorded any expenses yet.\n`;
-                 } else if (!expensesExist) {
-                     report += `- No expenses recorded yet. Start adding transactions to track your spending.\n`;
-                 }
-                 else {
-                     report += `- Good job! Your spending is currently within the allocated budget.\n`;
-                 }
-                  if (highestExpense.amount > totalBudget * 0.5 && totalBudget > 0) { // If one category is > 50% of total budget
-                     report += `- Consider evaluating the budget allocation for the "${highestExpense.name}" category, as it constitutes a significant portion of your expenses.\n`;
-                 }
+                // Simple Recommendations (Simulated AI)
+                report += `\nRecommendations:\n`;
+                if (overallBalance < 0) {
+                    report += `- Alert: You are over budget by ₹${Math.abs(overallBalance).toFixed(2)}. Review spending, especially in the "${highestExpense.name}" category.\n`;
+                } else if (expensePercentage > 85 && totalBudget > 0) {
+                    report += `- Warning: Spending is high (${expensePercentage.toFixed(1)}% of budget). Monitor expenses closely.\n`;
+                } else if (totalExpenses == 0 && totalBudget > 0) {
+                    report += `- You have allocated budget but not recorded any expenses yet.\n`;
+                } else if (!expensesExist) {
+                    report += `- No expenses recorded yet. Start adding transactions to track your spending.\n`;
+                }
+                else {
+                    report += `- Good job! Your spending is currently within the allocated budget.\n`;
+                }
+                if (highestExpense.amount > totalBudget * 0.5 && totalBudget > 0) { // If one category is > 50% of total budget
+                    report += `- Consider evaluating the budget allocation for the "${highestExpense.name}" category, as it constitutes a significant portion of your expenses.\n`;
+                }
 
-             } else {
-                 report += "No expenses recorded yet. Add transactions to get spending insights and recommendations.\n";
-             }
+            } else {
+                report += "No expenses recorded yet. Add transactions to get spending insights and recommendations.\n";
+            }
 
-             reportContainer.textContent = report;
-         }
+            reportContainer.textContent = report;
+        }
 
 
         // --- CORE LOGIC FUNCTIONS ---
@@ -791,8 +953,8 @@
             // Check if card name already exists (case-insensitive)
             const nameExists = budgetData.cards.some(card => card.name.toLowerCase() === cardName.toLowerCase());
             if (nameExists) {
-                 alert(`A category card with the name "${cardName}" already exists.`);
-                 return;
+                alert(`A category card with the name "${cardName}" already exists.`);
+                return;
             }
 
 
@@ -837,10 +999,10 @@
                 return;
             }
 
-             // Ensure transactions array exists
-             if (!targetCard.transactions) {
-                 targetCard.transactions = [];
-             }
+            // Ensure transactions array exists
+            if (!targetCard.transactions) {
+                targetCard.transactions = [];
+            }
 
             const newTransaction = {
                 id: Date.now(), // Simple timestamp ID for transaction
@@ -854,10 +1016,10 @@
 
             // Clear the form
             // document.getElementById('transaction-form').reset(); // This also resets dropdowns, maybe clear individually
-             amountInput.value = '';
-             dateInput.value = '';
-             document.getElementById('transaction-category').selectedIndex = 0; // Reset category dropdown
-             document.getElementById('transaction-type').selectedIndex = 0; // Reset type dropdown
+            amountInput.value = '';
+            dateInput.value = '';
+            document.getElementById('transaction-category').selectedIndex = 0; // Reset category dropdown
+            document.getElementById('transaction-type').selectedIndex = 0; // Reset type dropdown
 
 
             alert(`Transaction added successfully to "${targetCard.name}"!`);
@@ -867,26 +1029,26 @@
             renderAnalysisPage(); // Update table, chart, and AI report
         }
 
-         // Delete a specific transaction
-         function deleteTransaction(cardId, transactionId) {
-             const card = budgetData.cards.find(c => c.id === cardId);
-             if (!card || !card.transactions) return;
+        // Delete a specific transaction
+        function deleteTransaction(cardId, transactionId) {
+            const card = budgetData.cards.find(c => c.id === cardId);
+            if (!card || !card.transactions) return;
 
-             const transactionIndex = card.transactions.findIndex(tx => tx.id === transactionId);
+            const transactionIndex = card.transactions.findIndex(tx => tx.id === transactionId);
 
-             if (transactionIndex > -1) {
-                 const deletedTx = card.transactions.splice(transactionIndex, 1)[0]; // Remove the transaction
-                 saveData();
-                 console.log("Deleted transaction:", deletedTx);
-                 // Re-render affected areas
-                 renderHomePage(); // Update the card's list
-                 renderAnalysisPage(); // Update totals and analysis
-                 alert('Transaction deleted successfully.');
-             } else {
-                 console.error("Transaction not found for deletion:", transactionId);
-                 alert('Error: Could not find the transaction to delete.');
-             }
-         }
+            if (transactionIndex > -1) {
+                const deletedTx = card.transactions.splice(transactionIndex, 1)[0]; // Remove the transaction
+                saveData();
+                console.log("Deleted transaction:", deletedTx);
+                // Re-render affected areas
+                renderHomePage(); // Update the card's list
+                renderAnalysisPage(); // Update totals and analysis
+                alert('Transaction deleted successfully.');
+            } else {
+                console.error("Transaction not found for deletion:", transactionId);
+                alert('Error: Could not find the transaction to delete.');
+            }
+        }
 
 
         // --- INITIALIZATION & EVENT LISTENERS ---
@@ -898,48 +1060,48 @@
 
             // Setup Form Submission Listener
             const transactionForm = document.getElementById('transaction-form');
-            if(transactionForm) {
+            if (transactionForm) {
                 transactionForm.addEventListener('submit', addTransaction);
             } else {
-                 console.error("Transaction form not found!");
+                console.error("Transaction form not found!");
             }
 
 
             // Setup "Add Card" Button Listener
             const addCardBtn = document.getElementById('add-card-btn');
-             if(addCardBtn) {
+            if (addCardBtn) {
                 addCardBtn.addEventListener('click', addCard);
-             } else {
-                  console.error("Add card button not found!");
-             }
+            } else {
+                console.error("Add card button not found!");
+            }
 
             // Setup Event Delegation for Deleting Transactions
             const cardsContainer = document.getElementById('cards-container');
-             if(cardsContainer) {
+            if (cardsContainer) {
                 cardsContainer.addEventListener('click', (event) => {
                     if (event.target.classList.contains('delete-transaction-btn')) {
-                         const button = event.target;
-                         const transactionId = parseInt(button.getAttribute('data-transaction-id'), 10); // Ensure it's a number
-                         // Find the parent card element to get the cardId
-                         const cardElement = button.closest('.card');
-                         if (cardElement) {
-                             const cardId = cardElement.getAttribute('data-card-id');
-                             if (cardId && !isNaN(transactionId)) {
-                                 // Optional: Add confirmation
-                                 if (confirm('Are you sure you want to delete this transaction?')) {
-                                     deleteTransaction(cardId, transactionId);
-                                 }
-                             } else {
-                                 console.error("Could not find card ID or transaction ID for deletion.");
-                             }
-                         } else {
-                             console.error("Could not find parent card element for delete button.");
-                         }
+                        const button = event.target;
+                        const transactionId = parseInt(button.getAttribute('data-transaction-id'), 10); // Ensure it's a number
+                        // Find the parent card element to get the cardId
+                        const cardElement = button.closest('.card');
+                        if (cardElement) {
+                            const cardId = cardElement.getAttribute('data-card-id');
+                            if (cardId && !isNaN(transactionId)) {
+                                // Optional: Add confirmation
+                                if (confirm('Are you sure you want to delete this transaction?')) {
+                                    deleteTransaction(cardId, transactionId);
+                                }
+                            } else {
+                                console.error("Could not find card ID or transaction ID for deletion.");
+                            }
+                        } else {
+                            console.error("Could not find parent card element for delete button.");
+                        }
                     }
                 });
-             } else {
-                 console.error("Cards container not found for event delegation!");
-             }
+            } else {
+                console.error("Cards container not found for event delegation!");
+            }
 
 
             // Initial Render
@@ -948,8 +1110,8 @@
             // Analysis page renders when navigated to, but could pre-render if desired
             // renderAnalysisPage();
 
-             // Set the default active page (Home)
-             navigateTo('home-page');
+            // Set the default active page (Home)
+            navigateTo('home-page');
         }
 
         // Run initialization when the DOM is fully loaded
@@ -958,4 +1120,5 @@
     </script>
 
 </body>
+
 </html>
